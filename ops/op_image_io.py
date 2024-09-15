@@ -49,7 +49,7 @@ class SPIO_OT_import_image_as_reference(image_io, bpy.types.Operator):
 
     def execute(self, context):
         for filepath in self.files.split('$$'):
-            bpy.ops.object.load_reference_image(filepath=filepath)
+            bpy.ops.object.empty_image_add(filepath=filepath)
 
         return {'FINISHED'}
 
