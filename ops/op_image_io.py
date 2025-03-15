@@ -67,8 +67,8 @@ class SPIO_OT_import_image_as_plane(image_io, bpy.types.Operator):
         # 如果 Material 类型没有 shadow_method 属性，则添加一个 dummy 属性 20250315
         if not hasattr(bpy.types.Material, "shadow_method"):
             bpy.types.Material.shadow_method = bpy.props.StringProperty(default="NONE")
-
-        bpy.ops.import_image.to_plane(files=files, directory=directory, offset=True)
+        #原本是bpy.ops.import_image.to_plane,此插件目前被内置了
+        bpy.ops.image.import_as_mesh_planes(files=files, directory=directory, offset=True)
         return {'FINISHED'}
 
 
