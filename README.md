@@ -1,3 +1,13 @@
+# 更新说明
+这个版本存在的原因是，因blender更新后功能变化，原作者说停止维护并转移到新的类似插件了，而经过使用后发现新插件功能无法满足我的需要，所以决定自己来继续更新。
+## 20250315
+修复：剪贴板图片粘贴为平面或者参考不再报错。
+> 由于import_images_as_planes插件可能在4.2不再以内置插件而是自身功能的形式存在，所以理论上低于这个版本的需要手动开启此内置的插件。
+测试版本blender4.2.7-4.4
+
+---
+
+
 <p align="center">
   <a href="https://atticus-lv.gitee.io/super_io/#/">
     <img src="res/img/logo_bg.png" alt="logo" width="540px"/>

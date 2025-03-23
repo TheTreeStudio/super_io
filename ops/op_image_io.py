@@ -49,7 +49,7 @@ class SPIO_OT_import_image_as_reference(image_io, bpy.types.Operator):
 
     def execute(self, context):
         for filepath in self.files.split('$$'):
-            bpy.ops.object.load_reference_image(filepath=filepath)
+            bpy.ops.object.empty_image_add(filepath=filepath) #20240915 用于Blender4.2导入剪贴板图像为参考
 
         return {'FINISHED'}
 
@@ -60,12 +60,15 @@ class SPIO_OT_import_image_as_plane(image_io, bpy.types.Operator):
 
     def execute(self, context):
         filepaths = self.files.split('$$')
-        dir = os.path.dirname(filepaths[0]) + '\\'
-        files = [{"name": os.path.basename(filepath)} for filepath in
-                 filepaths]
+        # 使用 os.path.join 保证跨平台兼容性 20250315
+        directory = os.path.join(os.path.dirname(filepaths[0]), '')
+        files = [{"name": os.path.basename(filepath)} for filepath in filepaths]
 
-        bpy.ops.import_image.to_plane(files=files, directory=dir, offset=True)
-
+        # 如果 Material 类型没有 shadow_method 属性，则添加一个 dummy 属性 20250315
+        if not hasattr(bpy.types.Material, "shadow_method"):
+            bpy.types.Material.shadow_method = bpy.props.StringProperty(default="NONE")
+        #原本是bpy.ops.import_image.to_plane,此插件目前被内置了
+        bpy.ops.image.import_as_mesh_planes(files=files, directory=directory, offset=True)
         return {'FINISHED'}
 
 
