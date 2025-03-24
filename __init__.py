@@ -1,11 +1,11 @@
 bl_info = {
     "name": "Super IO (SPIO)",
-    "author": "Atticus", "TheTree",
+    "author": "Atticus,TheTree", 
     "blender": (4, 2, 0),
     "version": (1, 5, 1),
     "category": "Import-Export",
     "support": "COMMUNITY",
-    "doc_url": "https://github.com/TheTreeStudio/super_io-V2","https://atticus-lv.gitee.io/super_io/#/",
+    "doc_url": "https://github.com/TheTreeStudio/super_io-V2",
     "tracker_url": "https://github.com/TheTreeStudio/super_io-V2/issues",
     "description": "Copy paste to import and export Model/Images (Inspired by Binit's ImagePaste)",
     'warning': "Support Windows/MacOS (no copy multiple files to clipboard in mac)",
