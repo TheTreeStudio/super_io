@@ -11,6 +11,7 @@ from bpy.types import PropertyGroup
 
 from .. import __folder_name__
 import rna_keymap_ui
+from ..ui import ui_panel  # 新增导入
 
 
 def get_pref():
@@ -315,6 +316,20 @@ def change_panel_category():
         panel.bl_category = get_pref().category
         bpy.utils.register_class(panel)
 
+def change_panel_visibility():
+    """增强错误处理的可见性更新"""
+    try:
+        # 添加延迟确保操作顺序
+        import time
+        time.sleep(0.1)  # 100ms延迟
+        
+        from ..ui import ui_panel
+        ui_panel.update_panel_visibility()
+    except Exception as e:
+        print(f"Visibility update error: {repr(e)}")
+        import traceback
+        traceback.print_exc()      
+
 
 def update_category(self, context):
     try:
@@ -351,6 +366,16 @@ class SPIO_Preference(bpy.types.AddonPreferences):
                                 description="Force to use 'utf-8' to decode filepath \nOnly enable when your system coding 'utf-8'",
                                 default=False)
     cpp_obj_importer: BoolProperty(name='Use C++ obj importer', default=False)
+    
+
+    # 新增属性：控制 N 面板显示
+    show_n_panel: BoolProperty(
+        name="Show in N Panel",
+        description="Display plugin settings in the N Panel",
+        default=True,
+        update=lambda self, ctx: change_panel_visibility()  # 关键：绑定更新函数
+    )                            
+                                    
     # addon
     asset_helper: BoolProperty(name='Asset Helper', default=True)
     # asset helper batch import pbr tags
@@ -507,6 +532,11 @@ class SPIO_Preference(bpy.types.AddonPreferences):
 
             row = box.row(align=True)
             row.prop(self, 'category')
+            
+            # 新增：显示 N 面板的复选框
+            row = box.row(align=True)
+            row.prop(self, 'show_n_panel', text='')
+            row.label(text='Show in N Panel')      
 
             row = box.row(align=True)
             row.prop(self, 'report_time', text='')

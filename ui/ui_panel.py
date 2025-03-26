@@ -3,6 +3,7 @@ from ..ops.core import get_pref
 from ..preferences.prefs import SPIO_Preference
 from ..preferences.data_icon import G_ICON_ID
 
+_panels_registered = False # 新增全局变量，用于跟踪面板是否已注册
 
 class SidebarSetup:
     bl_category = "SPIO"
@@ -108,30 +109,81 @@ class SPIO_PT_AssetHelper(SidebarSetup, bpy.types.Panel):
         # box.operator('spio.set_asset_thumb_from_clipboard_image', icon='IMPORT')
 
 
-panels = (
+panels = [
     SPIO_PT_PrefPanel_283,
     SPIO_PT_PrefPanel_300,
     SPIO_PT_ImportPanel,
     SPIO_PT_AssetHelper,
-)
+]
 
 
 def register():
-    if bpy.app.version < (3, 0, 0):
-        bpy.utils.register_class(SPIO_PT_PrefPanel_283)
-    else:
-        bpy.utils.register_class(SPIO_PT_PrefPanel_300)
+    global _panels_registered
+    if _panels_registered:
+        return
+        
+    try:
+        pref = get_pref()
+        if not pref.show_n_panel:
+            return
 
-    bpy.utils.register_class(SPIO_PT_ImportPanel)
-    bpy.utils.register_class(SPIO_PT_AssetHelper)
+        # 根据版本选择需要注册的面板
+        version_panel = (
+            SPIO_PT_PrefPanel_283 
+            if bpy.app.version < (3, 0, 0) 
+            else SPIO_PT_PrefPanel_300
+        )
+        
+        # 注册核心面板
+        panels_to_register = [
+            version_panel,
+            SPIO_PT_ImportPanel,
+            SPIO_PT_AssetHelper
+        ]
+        
+        for panel in panels_to_register:
+            try:
+                if not hasattr(bpy.types, panel.__name__):
+                    bpy.utils.register_class(panel)
+            except Exception as e:
+                print(f"Error registering {panel.__name__}: {e}")
 
+        _panels_registered = True
+    except Exception as e:
+        print(f"Registration failed: {e}")
 
 def unregister():
-    if bpy.app.version < (3, 0, 0):
-        bpy.utils.unregister_class(SPIO_PT_PrefPanel_283)
-    else:
-        bpy.utils.unregister_class(SPIO_PT_PrefPanel_300)
+    global _panels_registered
+    if _panels_registered:
+        # 根据当前Blender版本选择需要注销的面板
+        version_specific_panels = [
+            SPIO_PT_PrefPanel_283 if bpy.app.version < (3, 0, 0) 
+            else SPIO_PT_PrefPanel_300,
+            SPIO_PT_ImportPanel,
+            SPIO_PT_AssetHelper
+        ]
+        
+        # 仅注销当前版本实际注册的面板
+        for panel in version_specific_panels:
+            if hasattr(bpy.types, panel.__name__):
+                try:
+                    bpy.utils.unregister_class(panel)
+                except Exception as e:
+                    print(f"Error unregistering {panel.__name__}: {e}")
+        
+        _panels_registered = False
 
-    bpy.utils.unregister_class(SPIO_PT_ImportPanel)
-    bpy.utils.unregister_class(SPIO_PT_AssetHelper)
-
+def update_panel_visibility():
+    """更安全的面板更新逻辑"""
+    try:
+        # 强制重置注册状态
+        global _panels_registered
+        if _panels_registered:
+            unregister()
+        
+        # 获取最新首选项设置
+        pref = get_pref()
+        if pref.show_n_panel:
+            register()
+    except Exception as e:
+        print(f"Panel visibility update failed: {e}")
