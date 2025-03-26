@@ -62,7 +62,7 @@ def get_asset_dir(subpath: AssetDir | None = None) -> Path:
 
 
 def get_template_dir(subpath: TemplateDir | None = None) -> Path:
-    d = get_asset_dir().joinpath(AssetDir.TEMPLATES.value)
+    d = get_asset_dir(AssetDir.TEMPLATES)# 直接获取 AssetDir.TEMPLATES 的路径
 
     assert subpath in TemplateDir or subpath is None, f'Template {subpath} not found.'
 
